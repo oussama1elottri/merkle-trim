@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+fl-env/
+*.egg-info/
+node_modules/
+artifacts/
+cache/
+coverage/
+coverage.json
+.env
+*.key
+.DS_Store
+*.pkl
