@@ -39,15 +39,10 @@ beta = 0.2
 malicious-fraction = 0.0
 
 # Default federation to use when running the app
-[tool.flwr.federations]
-default = "local-simulation"
 
-# Local simulation federation with 10 virtual SuperNodes
-[tool.flwr.federations.local-simulation]
-options.num-supernodes = 10
+# [tool.flwr.federations]
+# default = "local-simulation"
 
-# Remote federation example for use with SuperLink
-[tool.flwr.federations.remote-federation]
-address = "<SUPERLINK-ADDRESS>:<PORT>"
-insecure = true  # Remove this line to enable TLS
-# root-certificates = "<PATH/TO/ca.crt>"  # For TLS setup
+# # Local simulation federation with 10 virtual SuperNodes
+# [tool.flwr.federations.local-simulation]
+# options.num-supernodes = 10

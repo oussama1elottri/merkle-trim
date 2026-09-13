@@ -36,6 +36,7 @@ merkle-trim/            Root Directory
 ### 1. Python environment
 
 ```bash
+python3 -m venv fl-env
 source fl-env/bin/activate
 pip install -r fl-engine/scripts/requirements.txt
 ```
