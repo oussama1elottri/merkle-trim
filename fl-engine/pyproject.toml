@@ -39,10 +39,9 @@ beta = 0.2
 malicious-fraction = 0.0
 
 # Default federation to use when running the app
+[tool.flwr.federations]
+default = "local-simulation"
 
-# [tool.flwr.federations]
-# default = "local-simulation"
-
-# # Local simulation federation with 10 virtual SuperNodes
-# [tool.flwr.federations.local-simulation]
-# options.num-supernodes = 10
+# Local simulation federation with 10 virtual SuperNodes
+[tool.flwr.federations.local-simulation]
+options.num-supernodes = 10

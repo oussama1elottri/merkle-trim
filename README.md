@@ -36,8 +36,8 @@ merkle-trim/            Root Directory
 ### 1. Python environment
 
 ```bash
-python3 -m venv fl-env
-source fl-env/bin/activate
+conda create -n fl-env python=3.12 -y
+conda activate fl-env
 pip install -r fl-engine/scripts/requirements.txt
 ```
 
@@ -45,19 +45,21 @@ pip install -r fl-engine/scripts/requirements.txt
 
 ```bash
 cd fl-engine
-flwr run . --run-config "beta=0.2 malicious-fraction=0.2"
+flwr run . --stream --run-config "beta=0.2 malicious-fraction=0.2"
 ```
 
 ### 3. Run the smart contract test suite
 
 ```bash
-cd contracts
+cd ../contracts
+npm install
 npx hardhat test
 ```
 
 ### 4. Run the cross-language Merkle parity check
 
 ```bash
+cd ..
 python3 fl-engine/scripts/test_merkle_verification.py
 ```
 
