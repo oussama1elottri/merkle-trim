@@ -24,7 +24,6 @@ import hashlib
 import os
 
 
-# Flower ClientApp
 app = ClientApp()
 
 
@@ -32,16 +31,14 @@ app = ClientApp()
 def fit(msg: Message, context: Context):
     """Train the model on local data."""
 
-    # Create LogisticRegression Model
     penalty = context.run_config["penalty"]
     local_epochs = context.run_config["local-epochs"]
     model = get_model(penalty, local_epochs)
-    # Setting initial parameters, akin to model.compile for keras models
     set_initial_params(model)
 
-    # Apply received parameters
     ndarrays = msg.content["arrays"].to_numpy_ndarrays()
     set_model_params(model, ndarrays)
+
 
     # Load the data
     partition_id = context.node_config["partition-id"]
@@ -75,6 +72,10 @@ def fit(msg: Message, context: Context):
         # Train the model on local data
         model.fit(X_train, y_train)
 
+    # Compute honest training loss before any attack simulation
+    y_train_pred_proba = model.predict_proba(X_train)
+    train_logloss = float(log_loss(y_train, y_train_pred_proba))
+
     # Get trained weights
     weights = get_model_params(model)
 
@@ -91,7 +92,7 @@ def fit(msg: Message, context: Context):
         reveal_weights = [w * 50.0 for w in weights]
     elif malicious_type == 2:
         # Type 2: commit honestly to bad data (retrain on flipped labels)
-        y_flipped = (y_train.max() - y_train)
+        y_flipped = (9 - y_train)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             model.fit(X_train, y_flipped)
@@ -107,20 +108,15 @@ def fit(msg: Message, context: Context):
     else:
         reveal_weights = weights
 
-    # Compute train loss
-    y_train_pred_proba = model.predict_proba(X_train)
-    train_logloss = log_loss(y_train, y_train_pred_proba)
 
     # Construct and return reply Message with commitment + nonce
     model_record = ArrayRecord(reveal_weights)
-    # MetricRecord only accepts int/float — strings go in ConfigRecord
     metrics = {
         "num-examples": len(X_train),
         "train_logloss": train_logloss,
         "malicious_type": malicious_type,
     }
     metric_record = MetricRecord(metrics)
-    # Send commitment & nonce as strings via ConfigRecord
     commit_info = ConfigRecord({
         "commitment": commitment,
         "nonce": nonce.hex(),
@@ -134,17 +130,14 @@ def fit(msg: Message, context: Context):
 def evaluate(msg: Message, context: Context):
     """Evaluate the model on test data."""
 
-    # Create LogisticRegression Model
     penalty = context.run_config["penalty"]
     local_epochs = context.run_config["local-epochs"]
     model = get_model(penalty, local_epochs)
-
-    # Setting initial parameters, akin to model.compile for keras models
     set_initial_params(model)
 
-    # Apply received pararameters
     ndarrays = msg.content["arrays"].to_numpy_ndarrays()
     set_model_params(model, ndarrays)
+
 
     # Load the data
     partition_id = context.node_config["partition-id"]

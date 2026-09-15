@@ -7,22 +7,18 @@ from fl_engine.custom_strategy import VerifiableRobustStrategy
 
 from fl_engine.task import get_model, get_model_params, set_initial_params, set_model_params
 
-# Create ServerApp
 app = ServerApp()
 
 
 @app.main()
 def main(grid: Grid, context: Context) -> None:
-    """Main entry point for the ServerApp."""
-
-    # Read run config
     num_rounds: int = context.run_config["num-server-rounds"]
 
-    # Create LogisticRegression Model
     penalty = context.run_config["penalty"]
     local_epochs = context.run_config["local-epochs"]
     model = get_model(penalty, local_epochs)
     set_initial_params(model)
+
     arrays = ArrayRecord(get_model_params(model))
 
     # ── Read experiment parameters from run_config, with safe fallbacks ────

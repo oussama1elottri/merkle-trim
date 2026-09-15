@@ -5,12 +5,11 @@ from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import IidPartitioner
 from sklearn.linear_model import LogisticRegression
 
-fds = None  # Cache FederatedDataset
+fds = None
 
 
 def load_data(partition_id: int, num_partitions: int):
     """Load partition MNIST data."""
-    # Only initialize `FederatedDataset` once
     global fds
     if fds is None:
         partitioner = IidPartitioner(num_partitions=num_partitions)
@@ -23,11 +22,12 @@ def load_data(partition_id: int, num_partitions: int):
 
     X, y = dataset["image"][:].reshape((len(dataset), -1)), dataset["label"][:]
 
-    # Split the on edge data: 80% train, 20% test
+    # 80% train, 20% test split
     X_train, X_test = X[: int(0.8 * len(X))], X[int(0.8 * len(X)) :]
     y_train, y_test = y[: int(0.8 * len(y))], y[int(0.8 * len(y)) :]
 
     return X_train, X_test, y_train, y_test
+
 
 
 def get_model(penalty: str, local_epochs: int):
@@ -58,10 +58,11 @@ def set_model_params(model, params):
 
 
 def set_initial_params(model):
-    n_classes = 10  # MNIST has 10 classes
-    n_features = 784  # Number of features in dataset
+    n_classes = 10
+    n_features = 784
     model.classes_ = np.array([i for i in range(10)])
 
     model.coef_ = np.zeros((n_classes, n_features))
     if model.fit_intercept:
         model.intercept_ = np.zeros((n_classes,))
+

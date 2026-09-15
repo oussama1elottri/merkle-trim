@@ -9,8 +9,9 @@ console.log(`Connecting to FLCheckpoint on ${networkName}...`);
 
 const checkpoint = await viem.getContractAt("FLCheckpoint", CONTRACT_ADDRESS);
 
-const round = 3;
+const round = 1;
 const root  = "0x420940ee1c7a73de80cfa2554efb4e6cec7ea745fed73108ccb06886054df8c6";
+
 
 console.log(`Posting round ${round} with root ${root}...`);
 

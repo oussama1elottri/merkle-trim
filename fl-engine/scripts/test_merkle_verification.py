@@ -1,6 +1,9 @@
 import hashlib
-import subprocess
+import json
 import os
+import glob
+import shutil
+import subprocess
 
 def python_merkle_root(leaves):
     if not leaves:
@@ -34,30 +37,68 @@ def main():
     leaves_4 = [commit_A, commit_B, commit_C, commit_D]
     py_root_4 = python_merkle_root(leaves_4).hex()
 
-    print(f"\n[PYTHON] 3 Leaves (Odd) Merkle Root  : 0x{py_root_3}")
+    print(f"[PYTHON] 3 Leaves (Odd) Merkle Root  : 0x{py_root_3}")
     print(f"[PYTHON] 4 Leaves (Even) Merkle Root : 0x{py_root_4}\n")
 
-    env = os.environ.copy()
-    node_paths = ["/Users/itadmin/.nvm/versions/node/v24.18.0/bin", "/usr/local/bin", "/opt/homebrew/bin"]
-    env["PATH"] = ":".join(node_paths) + ":" + env.get("PATH", "")
+    # Export test vectors for EVM verification
+    test_cases = [
+        {
+            "name": "Case 1: 3 Leaves (Odd)",
+            "commitments": ["0x" + c.hex() for c in leaves_3],
+            "expectedRoot": "0x" + py_root_3
+        },
+        {
+            "name": "Case 2: 4 Leaves (Even)",
+            "commitments": ["0x" + c.hex() for c in leaves_4],
+            "expectedRoot": "0x" + py_root_4
+        }
+    ]
 
     hardhat_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "contracts"))
-    result = subprocess.run(
-        "npx hardhat test",
-        cwd=hardhat_dir,
-        env=env,
-        capture_output=True,
-        text=True,
-        shell=True
-    )
+    test_json_path = os.path.join(hardhat_dir, "merkle_parity_test.json")
 
-    print(result.stdout)
+    with open(test_json_path, "w") as f:
+        json.dump(test_cases, f, indent=2)
 
-    if result.returncode == 0:
-        print("\n[SUCCESS] Verification passed: Python Merkle root matches Solidity EVM byte-for-byte.")
-    else:
-        print(result.stderr)
-        print("\n[ERROR] Hardhat tests failed.")
+    # Dynamic environment PATH resolution for npx/node across NVM, Homebrew, and system paths
+    nvm_paths = sorted(glob.glob(os.path.expanduser("~/.nvm/versions/node/*/bin")), reverse=True)
+
+    system_paths = ["/usr/local/bin", "/opt/homebrew/bin", "/usr/bin", "/bin"]
+    all_paths = nvm_paths + system_paths + [os.environ.get("PATH", "")]
+
+    env = os.environ.copy()
+    env["PATH"] = ":".join(all_paths)
+    env["PARITY_TEST_FILE"] = test_json_path
+
+    npx_bin = os.path.join(nvm_paths[0], "npx") if nvm_paths else "npx"
+    cmd = f"{npx_bin} hardhat run scripts/verify-parity.ts"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=hardhat_dir,
+            env=env,
+            capture_output=True,
+            text=True,
+            shell=True
+        )
+
+
+
+        print("[EVM Verification Output]")
+        print(result.stdout)
+
+        if result.returncode == 0 and "[PASS]" in result.stdout:
+            print("[SUCCESS] Full Cross-Language Verification Passed!")
+            print("Python Merkle root output matches Solidity EVM execution byte-for-byte.")
+        else:
+            if result.stderr:
+                print(result.stderr)
+            print("\n[ERROR] Merkle parity verification failed!")
+            exit(1)
+    finally:
+        if os.path.exists(test_json_path):
+            os.remove(test_json_path)
 
 if __name__ == "__main__":
     main()

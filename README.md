@@ -63,6 +63,9 @@ cd ..
 python3 fl-engine/scripts/test_merkle_verification.py
 ```
 
+*(Note: Smart contract testnet scripts `post-checkpoint.ts` and `challenge-checkpoint.ts` serve as standalone demonstration utilities for Vana Moksha testnet deployment.)*
+
+
 ---
 
 ## Deployment & Testnet Guide

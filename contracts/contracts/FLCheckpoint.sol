@@ -66,6 +66,12 @@ contract FLCheckpoint {
             block.timestamp > postedAt[round] + CHALLENGE_WINDOW;
     }
 
+    // ── Public helper: recompute Merkle root for verification ─────────────────
+    function computeRoot(bytes32[] calldata commitments) external pure returns (bytes32) {
+        return _merkleRoot(commitments);
+    }
+
+
     // ── Merkle root — must exactly mirror VerifiableRobustStrategy._merkle_root ──
     function _merkleRoot(bytes32[] memory commitments) internal pure returns (bytes32) {
         uint256 n = commitments.length;

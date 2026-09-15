@@ -139,3 +139,6 @@ Posting cost is perfectly consistent across both real transactions (68,147 gas b
 5. **Simulated commit phases** — commit and reveal occur within a single round rather than two separate network round-trips. A production deployment would require genuine phase separation.
 
 6. **zk-proof of data integrity (future work)** — a zero-knowledge proof of data provenance between collection and training would close the Type 2 attribution gap. Not implemented in this project — identified as the highest-value direction for future extension.
+
+7. **Manual on-chain pipeline integration** — contract deployment, root posting, and dispute triggers on Vana Moksha testnet are currently invoked via standalone demonstration scripts (`post-checkpoint.ts`, `challenge-checkpoint.ts`) following round completion, rather than being directly wired into the Python Flower ServerApp execution loop.
+
