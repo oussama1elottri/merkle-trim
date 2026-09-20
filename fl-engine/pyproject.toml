@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 name = "merkle-trim"
 version = "1.0.0"
 description = "Verifiable and Byzantine-Robust Federated Learning Framework"
-license = "Apache-2.0"
+license = "MIT"
 # Flower App Dependencies
 dependencies = [
     "flwr[simulation]>=1.23.0",
