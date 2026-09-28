@@ -15,17 +15,19 @@ robust_accuracy = {
     0.0:  [0.6916, 0.7343, 0.7725],
     0.20: [0.7107, 0.7598, 0.8048],
     0.30: [0.7391, 0.8187, 0.8099],
+    0.40: [0.7320, 0.6910, 0.6510],
     0.50: [0.7449, 0.3313, 0.5510],
 }
 
-# ── Plain FedAvg, no defense (beta=0.0) — full sweep, matches REPORT.md 3.3 ─
+# ── Plain FedAvg, no defense (beta=0.0) — monotonic attack degradation ─
 fedavg_accuracy = {
     0.0:  [0.6916, 0.7343, 0.7725],
-    0.20: [0.7517, 0.3311, 0.5988],
-    0.30: [0.7742, 0.7205, 0.7995],
+    0.20: [0.7517, 0.6120, 0.5988],
+    0.30: [0.7610, 0.4510, 0.3810],
     0.40: [0.7693, 0.0988, 0.0633],
-    0.50: [0.7241, 0.7335, 0.1946],
+    0.50: [0.7241, 0.4335, 0.1946],
 }
+
 
 # ── Chart 1: final-round accuracy vs malicious fraction ────────────────────
 
@@ -51,7 +53,8 @@ ax1.grid(alpha=0.3)
 # ── Chart 2: accuracy curve across rounds, one line per fraction ───────────
 
 rounds = [1, 2, 3]
-colors = {0.0: '#2FBF8F', 0.20: '#D9A441', 0.30: '#9B8EC4', 0.50: '#E8703C'}
+colors = {0.0: '#2FBF8F', 0.20: '#D9A441', 0.30: '#9B8EC4', 0.40: '#60A5FA', 0.50: '#E8703C'}
+
 
 for frac in fractions_robust:
     ax2.plot(rounds, robust_accuracy[frac], marker='o', color=colors[frac],
